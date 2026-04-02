@@ -4,6 +4,8 @@ import com.example.cinemaBookingOnline.model.enums.BookingStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "bookings")
@@ -11,6 +13,19 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "screening_id")
+    private Screening screening;
+
+    @ManyToMany
+    @JoinTable(
+            name = "booking_seats",
+            joinColumns = @JoinColumn(name = "booking_id"),
+            inverseJoinColumns = @JoinColumn(name = "seat_id")
+    )
+    private Set<Seat> seats = new HashSet<>();
+
     private LocalDateTime createdAt;
     private BookingStatus status = BookingStatus.NONE;
 }
