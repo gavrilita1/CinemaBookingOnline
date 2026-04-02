@@ -2,6 +2,9 @@ package com.example.cinemaBookingOnline.model.entities;
 
 import com.example.cinemaBookingOnline.model.enums.BookingStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -9,6 +12,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "bookings")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
