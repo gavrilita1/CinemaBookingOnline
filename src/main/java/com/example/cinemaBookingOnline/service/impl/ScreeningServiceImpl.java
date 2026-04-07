@@ -60,7 +60,7 @@ public class ScreeningServiceImpl implements ScreeningService {
 
     @Override
     public List<Screening> getScreeningsByRoomId(Long id) {
-        return screeningRepository.findByRoomId(id);
+        return screeningRepository.findByCinemaRoomId(id);
     }
 
     @Override
