@@ -1,5 +1,7 @@
 package com.example.cinemaBookingOnline.service.impl;
 
+import com.example.cinemaBookingOnline.model.dto.MovieRequestDto;
+import com.example.cinemaBookingOnline.model.dto.MovieResponseDto;
 import com.example.cinemaBookingOnline.model.entities.Movie;
 import com.example.cinemaBookingOnline.repository.MovieRepository;
 import com.example.cinemaBookingOnline.service.MovieService;
@@ -15,27 +17,37 @@ public class MovieServiceImpl implements MovieService {
     private final MovieRepository movieRepository;
 
     @Override
-    public Movie createMovie(Movie movie) {
-        return movieRepository.save(movie);
+    public MovieResponseDto createMovie(MovieRequestDto dto) {
+        Movie movie = new Movie();
+        movie.setTitle(dto.title());
+        movie.setRating(dto.rating());
+        movie.setReleaseYear(dto.releaseYear());
+        Movie savedMovie = movieRepository.save(movie);
+
+        return toDto(savedMovie);
     }
 
     @Override
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+    public List<MovieResponseDto> getAllMovies() {
+        return movieRepository.findAll().stream()
+//                .map(movie -> toDto(movie)) alternative
+                .map(this::toDto)
+                .toList();
     }
 
     @Override
-    public Movie getMovieById(Long id) {
-        return movieRepository.findById(id).orElseThrow(()-> new RuntimeException("Movie not found with id: " + id));
+    public MovieResponseDto getMovieById(Long id) {
+        return toDto(movieRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Movie not found with id: " + id)));
     }
 
     @Override
-    public Movie updateMovie(Long id, Movie movie) {
-        Movie movieFound = movieRepository.findById(id).orElseThrow(()-> new RuntimeException("Movie not found: " + id));
-        movieFound.setTitle(movie.getTitle());
-        movieFound.setRating(movie.getRating());
-        movieFound.setReleaseYear(movie.getReleaseYear());
-        return movieRepository.save(movieFound);
+    public MovieResponseDto updateMovie(Long id, MovieRequestDto dto) {
+        Movie movieFound = movieRepository.findById(id).orElseThrow(() -> new RuntimeException("Movie not found: " + id));
+        movieFound.setTitle(dto.title());
+        movieFound.setRating(dto.rating());
+        movieFound.setReleaseYear(dto.releaseYear());
+        return toDto(movieRepository.save(movieFound));
     }
 
     @Override
