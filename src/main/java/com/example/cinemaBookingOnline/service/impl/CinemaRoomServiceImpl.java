@@ -1,6 +1,7 @@
 package com.example.cinemaBookingOnline.service.impl;
 
 import com.example.cinemaBookingOnline.model.dto.CinemaRoomRequestDto;
+import com.example.cinemaBookingOnline.model.dto.CinemaRoomResponseDto;
 import com.example.cinemaBookingOnline.model.entities.CinemaRoom;
 import com.example.cinemaBookingOnline.model.entities.Seat;
 import com.example.cinemaBookingOnline.repository.CinemaRoomRepository;
@@ -19,7 +20,7 @@ public class CinemaRoomServiceImpl implements CinemaRoomService {
     private final SeatRepository seatRepository;
 
     @Override
-    public CinemaRoom createRoom(CinemaRoomRequestDto dto) {
+    public CinemaRoomResponseDto createRoom(CinemaRoomRequestDto dto) {
         CinemaRoom room = new CinemaRoom();
         room.setCols_count(dto.cols_count());
         room.setRows_count(dto.rows_count());
@@ -36,16 +37,19 @@ public class CinemaRoomServiceImpl implements CinemaRoomService {
             }
         }
 
-        return roomSaved;
+        return toDto(roomSaved);
     }
 
     @Override
-    public List<CinemaRoom> getAllRooms() {
-        return cinemaRoomRepository.findAll();
+    public List<CinemaRoomResponseDto> getAllRooms() {
+        return cinemaRoomRepository.findAll()
+                .stream()
+                .map(cinemaRoom -> toDto(cinemaRoom))
+                .toList();
     }
 
     @Override
-    public CinemaRoom getRoomById(Long id) {
-        return cinemaRoomRepository.findById(id).orElseThrow(() -> new RuntimeException("Room not found"));
+    public CinemaRoomResponseDto getRoomById(Long id) {
+        return toDto(cinemaRoomRepository.findById(id).orElseThrow(() -> new RuntimeException("Room not found")));
     }
 }

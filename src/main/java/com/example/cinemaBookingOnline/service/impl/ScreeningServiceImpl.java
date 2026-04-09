@@ -1,6 +1,7 @@
 package com.example.cinemaBookingOnline.service.impl;
 
 import com.example.cinemaBookingOnline.model.dto.ScreeningRequestDTO;
+import com.example.cinemaBookingOnline.model.dto.ScreeningResponseDto;
 import com.example.cinemaBookingOnline.model.entities.CinemaRoom;
 import com.example.cinemaBookingOnline.model.entities.Movie;
 import com.example.cinemaBookingOnline.model.entities.Screening;
@@ -25,7 +26,7 @@ public class ScreeningServiceImpl implements ScreeningService {
 
 
     @Override
-    public Screening createScreening(ScreeningRequestDTO dto) {
+    public ScreeningResponseDto createScreening(ScreeningRequestDTO dto) {
 
         Movie movie = movieRepository.findById(dto.movieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found : " + dto.movieId()));
@@ -39,47 +40,62 @@ public class ScreeningServiceImpl implements ScreeningService {
         screening.setPrice(dto.price());
         screening.setStartTime(LocalDate.now());
 
-
-        return screeningRepository.save(screening);
+        return toDto(screeningRepository.save(screening));
     }
 
     @Override
-    public List<Screening> getAllScreenings() {
-        return screeningRepository.findAll();
+    public List<ScreeningResponseDto> getAllScreenings() {
+        return screeningRepository.findAll()
+                .stream()
+                .map( screening -> toDto(screening))
+                .toList();
     }
 
     @Override
-    public Screening getScreeningById(Long id) {
-        return screeningRepository.findById(id).orElseThrow(() -> new RuntimeException("Screen not found"));
+    public ScreeningResponseDto getScreeningById(Long id) {
+        return toDto(screeningRepository.findById(id).orElseThrow(() -> new RuntimeException("Screen not found")));
     }
 
     @Override
-    public List<Screening> getScreeningsByMovieId(Long id) {
-        return screeningRepository.findByMovieId(id);
+    public List<ScreeningResponseDto> getScreeningsByMovieId(Long id) {
+        return screeningRepository.findByMovieId(id)
+                .stream()
+                .map( screening -> toDto(screening) )
+                .toList();
     }
 
     @Override
-    public List<Screening> getScreeningsByRoomId(Long id) {
-        return screeningRepository.findByCinemaRoomId(id);
+    public List<ScreeningResponseDto> getScreeningsByRoomId(Long id) {
+        return screeningRepository.findByCinemaRoomId(id)
+                .stream()
+                .map(screening -> toDto(screening))
+                .toList();
     }
 
     @Override
-    public List<Screening> getScrenningsByPeriod(LocalDate start, LocalDate end) {
-        return screeningRepository.findByStartTimeBetween(start, end);
+    public List<ScreeningResponseDto> getScrenningsByPeriod(LocalDate start, LocalDate end) {
+        return screeningRepository.findByStartTimeBetween(start, end)
+                .stream()
+                .map(screening -> toDto(screening))
+                .toList();
     }
 
     @Override
-    public List<Screening> getScrenningsByPeriodQuery(LocalDate start, LocalDate end) {
-        return screeningRepository.getScreeningsByPeriod(start, end);
+    public List<ScreeningResponseDto> getScrenningsByPeriodQuery(LocalDate start, LocalDate end) {
+        return screeningRepository.getScreeningsByPeriod(start, end)
+                .stream()
+                .map(screening -> toDto(screening))
+                .toList();
     }
 
     @Override
-    public Screening updateScreening(Long id, ScreeningRequestDTO dto) {
-        Screening screening = getScreeningById(id);
+    public ScreeningResponseDto updateScreening(Long id, ScreeningRequestDTO dto) {
+
+        Screening screening = screeningRepository.findById(id).orElseThrow(() -> new RuntimeException("Screen not found"));
         screening.setMovie(movieRepository.findById(dto.movieId()).orElseThrow(() -> new RuntimeException()));
         screening.setCinemaRoom(cinemaRoomRepository.findById(dto.roomId()).orElseThrow(() -> new RuntimeException()));
         screening.setPrice(dto.price());
-        return screeningRepository.save(screening);
+        return toDto( screeningRepository.save(screening));
     }
 
     @Override
